@@ -21,7 +21,7 @@ def register_view(request):
 
 
 def login_view(request):
-    print("--------------now user can login -----------------")
+   
 
     if request.method == "POST":
         email = request.POST.get("email")
@@ -39,7 +39,7 @@ def login_view(request):
                 request.session.set_expiry(0)
 
             messages.success(request, "Logged in successful")
-            return redirect(reverse("accounts:home_page"))
+            return redirect(reverse("store:home_page"))
 
         messages.error(request, "Email or password is incorrect")
 

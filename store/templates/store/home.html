@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Home — Organic Store{% endblock title %}
+
+{% block extra_head %}
+<style>
+    /* HERO SECTION */
+    .hero {
+        background: linear-gradient(160deg, #e8f5e4 0%, #f4f9f4 70%, #ffffff 100%);
+        padding: 120px 0 80px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero h1 {
+        font-family: 'Caveat', cursive !important;
+        font-size: 3rem;
+        color: var(--organic-dark);
+        margin-bottom: 20px;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        color: #3e6b3e;
+        margin-bottom: 30px;
+    }
+
+    .btn-hero {
+        background-color: var(--organic-primary);
+        color: #fff;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-hero:hover {
+        background-color: var(--organic-dark);
+        color: #fff;
+    }
+
+    /* BENEFITS SECTION */
+    .benefits {
+        padding: 60px 0 40px;
+        text-align: center;
+    }
+
+    .benefits h2 {
+        font-family: 'Caveat', cursive !important;
+        color: var(--organic-dark);
+        margin-bottom: 40px;
+    }
+
+    .benefit-card {
+        padding: 20px;
+        border-radius: 12px;
+        background: #ffffffd9;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin: 10px;
+        transition: transform 0.2s;
+    }
+
+    .benefit-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .benefit-card i {
+        font-size: 2.5rem;
+        color: var(--organic-primary);
+        margin-bottom: 15px;
+    }
+
+    /* PRODUCT CARDS */
+    .product-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: transform 0.2s;
+        background: #ffffffd9;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .product-card-body {
+        padding: 15px;
+        text-align: center;
+    }
+
+    .product-card-body h5 {
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .product-card-body p {
+        color: #6a9c63;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+
+    .btn-add {
+        background-color: var(--organic-primary);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 20px;
+        transition: 0.2s;
+    }
+
+    .btn-add:hover {
+        background-color: var(--organic-dark);
+    }
+
+    /* MEMBERSHIP SECTION */
+    .membership {
+        background: #f4f9f4;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    .membership h2 {
+        font-family: 'Caveat', cursive !important;
+        color: var(--organic-dark);
+        margin-bottom: 25px;
+    }
+
+    .membership p {
+        font-size: 1.1rem;
+        color: #3e6b3e;
+        margin-bottom: 25px;
+    }
+
+    .btn-membership {
+        background-color: var(--organic-primary);
+        color: #fff;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-membership:hover {
+        background-color: var(--organic-dark);
+        color: #fff;
+    }
+</style>
+{% endblock extra_head %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <h1>Welcome to Organic Store</h1>
+    <p>Fresh • Healthy • Natural</p>
+    <a href="{% url 'store:products_page' %}" class="btn-hero">Shop Now</a>
+</section>
+
+<!-- BENEFITS SECTION -->
+<section class="benefits container">
+    <h2>Why Choose Us</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="benefit-card">
+                <i class="bi bi-emoji-smile"></i>
+                <h5>Fresh & Healthy</h5>
+                <p>Our products are handpicked and organic, ensuring maximum freshness.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="benefit-card">
+                <i class="bi bi-award"></i>
+                <h5>Organic Certified</h5>
+                <p>All products are certified organic for your safety and trust.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="benefit-card">
+                <i class="bi bi-truck"></i>
+                <h5>Free Delivery</h5>
+                <p>Get your products delivered to your doorstep quickly and safely.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="container mt-5">
+    <h2 class="text-center mb-4" style="color: var(--organic-dark); font-family: 'Caveat', cursive;">Featured Products
+    </h2>
+    <div class="row g-4">
+
+        {% for product in products %}
+        <div class="col-md-3 col-sm-6">
+            <div class="card product-card">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                <div class="product-card-body">
+                    <h5>{{ product.name }}</h5>
+                    <p>${{ product.price }}</p>
+                    <a href="" class="btn-add">View</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No products found!</p>
+        {% endfor %}
+
+    </div>
+</section>
+
+<!-- MEMBERSHIP SECTION -->
+<section class="membership">
+    <h2>Join Our Membership</h2>
+    <p>Become a member and enjoy exclusive discounts on all our organic products.</p>
+    <a href="/membership/signup/" class="btn-membership">Get Membership</a>
+</section>
+
+{% endblock content %}
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">

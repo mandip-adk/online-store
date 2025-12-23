@@ -114,7 +114,7 @@
     <nav class="navbar navbar-expand-lg navbar-organic shadow-sm">
         <div class="container">
 
-            <a class="navbar-brand" href="/">🌿 Organic Store</a>
+             <a class="navbar-brand" href="{% url 'store:home_page' %}">🌿 Organic Store</a>
 
             <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarOrganic">
@@ -123,8 +123,8 @@
 
             <div class="collapse navbar-collapse" id="navbarOrganic">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products/">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'store:home_page' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'store:products_page' %}">Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
                 </ul>
