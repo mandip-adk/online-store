@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock title %}</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Fonts: Poppins & Caveat -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Caveat:wght@600&display=swap"
+        rel="stylesheet">
+
+
+    <style>
+        :root {
+            --organic-primary: #6a9c63;
+            --organic-dark: #3e6b3e;
+            --organic-light: #f4f9f4;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 1.05rem;
+
+            /* Smooth Organic Gradient Background */
+            background: linear-gradient(160deg,
+                    #e8f5e4 0%,
+                    #f4f9f4 40%,
+                    #ffffff 100%);
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar-organic {
+            background-color: var(--organic-primary);
+        }
+
+        .navbar-organic .navbar-brand {
+            font-family: 'Caveat', cursive !important;
+            color: white !important;
+            font-size: 1.9rem;
+            letter-spacing: 1px;
+        }
+
+        .navbar-organic .nav-link,
+        .navbar-organic .dropdown-toggle {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        .navbar-organic .nav-link:hover,
+        .navbar-organic .dropdown-item:hover {
+            background-color: var(--organic-dark);
+            color: #fff !important;
+        }
+
+        /* FOOTER */
+        .footer-organic {
+            background: var(--organic-dark);
+            color: white;
+            padding: 25px 0;
+            margin-top: 40px;
+            font-size: 0.95rem;
+        }
+
+        .footer-organic a {
+            color: #d4e8d4;
+            text-decoration: none;
+        }
+
+        .footer-organic a:hover {
+            text-decoration: underline;
+            color: #fff;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock extra_head %}
+</head>
+
+<body>
+
+    {% if messages %}
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        {% for message in messages %}
+        <div class="toast align-items-center text-bg-{{ message.tags }} border-0 mb-2" role="alert"
+            aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    {{ message }}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+            var toastList = toastElList.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl, { delay: 5000 }) // 5s
+            });
+            toastList.forEach(toast => toast.show());
+        });
+    </script>
+    {% endif %}
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-organic shadow-sm">
+        <div class="container">
+
+            <a class="navbar-brand" href="/">🌿 Organic Store</a>
+
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarOrganic">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarOrganic">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products/">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
+                </ul>
+
+                {% if request.user.is_authenticated %}
+                <a class="nav-link " href="{% url 'accounts:logout_page' %}" >
+                            Logout
+                        </a>
+                {% else %}
+                <!-- LOGIN DROPDOWN -->
+                        <a class="nav-link " href="{% url 'accounts:login_page' %}">
+                            Login
+                        </a>
+                {% endif %}
+
+            </div> <!-- collapse navbar -->
+        </div> <!-- container -->
+    </nav>
+
+    
+                <!-- PAGE CONTENT -->
+    <main class="container pt-4" style="min-height: 75dvh;">
+        {% block content %}{% endblock content %}
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="footer-organic text-center">
+        <div class="container">
+            <p class="mb-1 fw-semibold">© {{ year|default:2025 }} Organic Store — Fresh • Healthy • Natural</p>
+            <p class="small mb-0">
+                <a href="/privacy/">Privacy Policy</a> •
+                <a href="/terms/">Terms</a> •
+                <a href="/contact/">Contact</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
