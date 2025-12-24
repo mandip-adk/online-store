@@ -18,7 +18,7 @@
     }
 
     .products-grid {
-        padding: 50px 0;
+        padding:0;
     }
 
     .product-card {
@@ -86,52 +86,102 @@
     <p>Fresh, healthy, and organic products for you</p>
 </section>
 
-<!-- PRODUCTS GRID -->
-<section class="container products-grid">
-    <div class="row g-4">
+<section class="d-flex gap-5">
 
-        {% for product in products %}
-        <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="card product-card">
-            <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                <div class="product-card-body">
-                    <h5>{{ product.name }}</h5>
-                    <p>${{ product.price }}</p>
-                    <a href="" class="btn-add">View</a>
+    <!-- FILTER SIDEBAR -->
+    <div style="max-width: 20%;">
+        <h4>Filters</h4>
+
+        <form method="get" class="d-flex flex-column gap-2">
+
+            <label>{{ filter_form.name.label }}</label>
+            {{ filter_form.name }}
+
+            <div class="d-flex gap-2">
+                <div>
+                    <label>{{ filter_form.min_price.label }}</label>
+                    {{ filter_form.min_price }}
+                </div>
+
+                <div>
+                    <label>{{ filter_form.max_price.label }}</label>
+                    {{ filter_form.max_price }}
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <p class="text-center">No products available.</p>
-        {% endfor %}
 
+            <label class="mt-2">{{ filter_form.categories.label }}</label>
+            {{ filter_form.categories }}
+
+            {{ filter_form.sorting_key.lavel}}
+            {{ filter_form.sorting_key}}
+
+            <div class="d-flex gap-2 mt-2">
+                <button class="btn btn-success w-100" type="submit">Filter</button>
+                <a href="{% url 'store:products_page' %}" class="btn btn-primary w-100">Reset</a>
+            </div>
+
+        </form>
+       
     </div>
 
-    <!-- OPTIONAL PAGINATION -->
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            {% if products.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
-            </li>
-            {% else %}
-            <li class="page-item disabled"><span class="page-link">Previous</span></li>
-            {% endif %}
+    <!-- PRODUCTS GRID -->
+    <section class="container products-grid">
+        <div class="row g-4">
 
-            {% for num in products.paginator.page_range %}
-            {% if products.number == num %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-            {% endif %}
+            {% for product in products %}
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card product-card">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    <div class="product-card-body">
+                        <h5>{{ product.name }}</h5>
+                        <p>Rs. {{ product.price }}</p>
+                        <a href="#" class="btn-add">View</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No products found.</p>
             {% endfor %}
 
-            {% if products.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}">Next</a></li>
-            {% else %}
-            <li class="page-item disabled"><span class="page-link">Next</span></li>
-            {% endif %}
-        </ul>
-    </nav>
+        </div>
+
+        <!-- PAGINATION -->
+        <nav>
+            <ul class="pagination">
+
+                {% if products.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ products.previous_page_number }}">
+                        Previous
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ products.next_page_number }}">
+                        Next
+                    </a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+
+    </section>
+
 </section>
+
+
 
 {% endblock content %}
