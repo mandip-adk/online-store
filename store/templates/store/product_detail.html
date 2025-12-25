@@ -7,11 +7,23 @@
     .product-detail {
         padding: 60px 0;
     }
+    .product-image-wrapper {
+    width: 100%;
+    max-width: 420px;        /* control overall size */
+    height: 420px;           /* fixed height */
+    margin-left: 0 ;          /* center horizontally */
+    border-radius: 12px;
+    overflow: hidden;        /* IMPORTANT */
+    background-color: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
 
     .product-img {
-        width: 100%;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .product-info h1 {
@@ -113,24 +125,28 @@
     <div class="row g-5">
         <!-- PRODUCT IMAGE -->
         <div class="col-md-6">
+            <div class="product-image-wrapper">
             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+            </div>
+        
+            <form class="mt-5 d-flex gap-4 align-items-end",method="POST" action="{% url 'store:add_to_cart' product.id %}">
+                {% csrf_token %}
+                <div class="d-flex align-items-end gap-2">
+                    <label for="quantity" class="fw-bold fs-5 ">Quantity:</label>
+                    <input type="number" name="quantity" value="1" min="1" class="form-control"
+                    style="max-width:100px;">
+                </div>
+                <button type="submit" class="btn-add-cart">Add to Cart</button>
+            </form>
         </div>
 
         <!-- PRODUCT INFO -->
         <div class="col-md-6 product-info">
             <h1>{{ product.name|title }}</h1>
             <p class="price"> Rs.{{ product.price }}</p>
-            <p class="description">{{ product.description }}</p>
+            <p class="description">{{ product.description| default:"No description available." }}</p>
 
-            <form method="POST" action="{% url 'store:add_to_cart' product.id %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="quantity" class="form-label">Quantity:</label>
-                    <input type="number" name="quantity" value="1" min="1" class="form-control"
-                        style="max-width:100px;">
-                </div>
-                <button type="submit" class="btn-add-cart">Add to Cart</button>
-            </form>
+            
         </div>
     </div>
 

@@ -206,8 +206,8 @@
                 <img src="{{ product.image.url }}" alt="{{ product.name }}">
                 <div class="product-card-body">
                     <h5>{{ product.name }}</h5>
-                    <p>${{ product.price }}</p>
-                    <a href="" class="btn-add">View</a>
+                    <p>Rs.{{ product.price }}</p>
+                    <a href="{% url 'store:product_detail_page' product.id %}" class="btn-add">View</a>
                 </div>
             </div>
         </div>
