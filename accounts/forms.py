@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
-
+from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 class CustomUserCreationForm(UserCreationForm):
     password1 = forms.CharField(
@@ -14,5 +14,12 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ("email",)
+        fields = ("email","first_name","last_name")
         widgets = {"email": forms.EmailInput(attrs={"class": "form-control"})}
+
+class CustomUserChangeForm(forms.ModelForm):
+    password = ReadOnlyPasswordHashField()
+
+    class Meta:
+        model = CustomUser
+        fields = ("email","password","first_name","last_name","role")

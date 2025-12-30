@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Cart, CartProduct , Order , OrderItem
+from .models import Product, Cart, CartProduct , Order , OrderItem, Payment
 from django.core.paginator import Paginator
 from .forms import ProductFilterForm
 from django.urls import reverse, reverse_lazy
@@ -8,6 +8,11 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import F, Sum, ExpressionWrapper, DecimalField
 from .utils import generate_order_id
 from django.db import transaction, IntegrityError
+import requests
+import json
+from decimal import Decimal
+from django.conf import settings
+
 
 def home(request):
 
@@ -171,7 +176,9 @@ def place_order(request):
         with transaction.atomic():
             # create new order
             new_order = Order.objects.create(
-                user=request.user, order_id=order_id, subtotal=cart_sub_total
+                user=request.user, order_id=order_id,
+                subtotal=cart_sub_total,
+                total = cart_sub_total,
             )
 
             # create order items for newly created order
@@ -220,3 +227,139 @@ def order(request):
     context = {"orders": orders}
 
     return render(request, "store/order.html", context)
+
+
+@login_required(login_url="accounts:login_page")
+def khalti_payment(request, order_id):
+    order = get_object_or_404(
+        Order,
+        order_id=order_id,
+        user=request.user,
+    )
+
+    if order.status == Order.Status.PAID:
+        messages.info(request, "This order is already paid.")
+        return redirect("store:order_page")
+    
+    purchase_order_id = f"TR-{order.order_id}"
+
+    # 2. Create or reuse payment safely
+    payment, created = Payment.objects.get_or_create(
+        purchase_order_id=purchase_order_id,
+        defaults={
+            "order": order,
+            "amount": order.total,
+            "status": Payment.Status.INITIATED,
+        },
+    )
+
+    if not created and payment.status != Payment.Status.INITIATED:
+        messages.warning(request, "Payment already processed for this order.")
+        return redirect("store:order_page")
+
+    amount_paisa = int((payment.amount * Decimal("100")).quantize(Decimal("1")))
+
+    payload = {
+        "return_url": settings.SITE_URL + reverse("store:khalti_payment_response"),
+        "website_url": settings.SITE_URL + reverse("store:home_page"),
+        "amount": amount_paisa,
+        "purchase_order_id": payment.purchase_order_id,
+        "purchase_order_name": str(order.order_id),
+        "customer_info": {
+            "name": request.user.get_full_name() or request.user.email,
+            "email": request.user.email,
+            "phone": getattr(order, "phone", "no phone"),
+        },
+    }
+    if not created and payment.status != Payment.Status.INITIATED:
+        messages.warning(request, "Payment already processed for this order.")
+        return redirect("store:order_page")
+
+    amount_paisa = int((payment.amount * Decimal("100")).quantize(Decimal("1")))
+
+    payload = {
+        "return_url": settings.SITE_URL + reverse("store:khalti_payment_response"),
+        "website_url": settings.SITE_URL + reverse("store:home_page"),
+        "amount": amount_paisa,
+        "purchase_order_id": payment.purchase_order_id,
+        "purchase_order_name": str(order.order_id),
+        "customer_info": {
+            "name": request.user.get_full_name() or request.user.email,
+            "email": request.user.email,
+            "phone": getattr(order, "phone", "no phone"),
+        },
+    }
+
+    headers = {
+        "Authorization": f"Key {settings.KHALTI_SECRET_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    try:
+        response = requests.post(
+            "https://dev.khalti.com/api/v2/epayment/initiate/",
+            json=payload,
+            headers=headers,
+            timeout=10,
+        )
+
+        response.raise_for_status()
+        data = response.json()
+    except requests.RequestException as e:
+        messages.error(request, "Payment service unavailable. Try again later.")
+        return redirect("store:order_page")
+    pidx = data.get("pidx")
+    payment_url = data.get("payment_url")
+
+    if not pidx or not payment_url:
+        messages.error(request, "Invalid response from payment gateway.")
+        return redirect("store:order_page")
+    
+    payment.pidx = pidx
+    payment.save(update_fields=["pidx"])
+
+    return redirect(payment_url)
+
+
+
+
+@login_required(login_url=reverse_lazy("accounts:login_page"))
+def khalti_payment_response(request):
+    payment_status = request.GET.get("status")
+    pidx = request.GET.get("pidx")
+    transaction_id = request.GET.get("transcation_id")
+    purchase_order_id = request.GET.get("purchase_order_id")
+    amount =Decimal (request.Get.get("total_amount")) /100
+
+
+    try:
+        payment = Payment.objects.get(
+            pidx=pidx,
+            purchase_order_id=purchase_order_id,
+            amount=amount
+        )
+    except Payment.DoesNotExist:
+        messages.error(request, "Payment not verified yet, please contact the administrator.")
+        return redirect("store:home_page")
+    except Exception:
+        messages.error(request, "Payment not verified yet, please contact the administrator.")
+        return redirect("store:home_page")
+    else:
+        try:
+            with transaction.atomic():
+                payment.status = Payment.Status.SUCCESS
+                payment.save()
+                
+                order = payment.order   # ✅ get related order object
+                order.status = Order.Status.PAID
+                order.save()
+
+        except IntegrityError:
+            messages.error(request, "Payment not verified yet, please contact the administrator.")
+            return redirect("store:home_page")
+        else:
+            messages.success(
+                request,
+                "Payment done, please wait for product to reach your doorstep."
+            )
+            return redirect("store:order_page")

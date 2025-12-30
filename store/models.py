@@ -137,15 +137,18 @@ class Payment(models.Model):
         related_name="payment",
     )
 
-    method = models.CharField(max_length=20, choices=Method.choices)
+    method = models.CharField(max_length=20, choices=Method.choices, default=Method.KHALTI)
 
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
         default=Status.INITIATED,
     )
+    purchase_order_id = models.CharField(max_length=100, unique= True)
 
-    transaction_id = models.CharField(max_length=100, null=True, blank=True)
+    #from khalti
+    transaction_id = models.CharField(max_length=100, unique=True , null=True, blank=True)
+    pidx = models.CharField(max_length=100, unique= True)
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 

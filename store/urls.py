@@ -20,4 +20,9 @@ urlpatterns = [
     path("place-order/", views.place_order, name="place_order"),
     path("order/view", views.order, name="order_page"),
     path("order/<int:pk>/cancel/", views.cancel_order, name="cancel_order"),
+
+    #khalti-payment
+    path("order/<order_id>/payment/khalti", views.khalti_payment, name="khalti_payment"),
+    path("order/payment/khalti", views.khalti_payment_response, name="khalti_payment_response"),
+    
 ]
