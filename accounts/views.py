@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, ShippingAddressForm
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from.models import ShippingAddress
 
 
 def register_view(request):
@@ -56,3 +57,19 @@ def logout_view(request):
 def home_view(request):
     return render(request, "base.html")
 
+@login_required(login_url="accounts:login_page")
+
+def customer_profile(request):
+    if request.method == "POST":
+        form = ShippingAddressForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user
+            address.save()
+            return redirect("accounts:customer_profile")
+    else:
+        form = ShippingAddressForm()
+        addresses = ShippingAddress.objects.filter(user=request.user)
+        
+    context = {"form":form, "addresses":addresses}
+    return render(request, "accounts/customer_profile.html", context)

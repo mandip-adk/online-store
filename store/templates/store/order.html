@@ -115,7 +115,7 @@
         <div class="d-flex justify-content-between">
             <div class="d-flex gap-3 ">
                 <h2> {{order.order_id}} </h2>
-                <p class="order-status"> {{order.status}}</p>
+                <p class="order-status"> {{order.get_status_display}}</p>
             </div>
             <div class="d-flex gap-2">
                 <a href="{% url 'store:khalti_payment' order.order_id %}" class="btn btn-success">Pay</a>
@@ -156,12 +156,6 @@
         </tbody>
     </table>
     {% endfor %}
-
-
-    <!-- shipping address  -->
-    <div>
-        Shipping address form
-    </div>
 
 
     {% else %}
